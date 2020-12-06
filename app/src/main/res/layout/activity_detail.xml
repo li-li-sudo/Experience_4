@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="10dp"
+    android:paddingLeft="10dp"
+    android:paddingRight="10dp"
+    android:paddingTop="10dp"
+    android:background="@drawable/bg"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:id="@+id/top"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_weight="3">
+        <RelativeLayout
+            android:layout_marginTop="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="40dp">
+            <Button
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:id="@+id/back"
+                android:layout_gravity="left|center_vertical"
+                android:background="@drawable/back"
+
+                />
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="322dp"
+                android:layout_height="40dp"
+                android:gravity="center_vertical|center_horizontal"
+                android:lines="1"
+                android:layout_marginLeft="35dp"
+                android:text="歌名"
+                android:textColor="#E5E5E5"
+                android:textSize="25dp" />
+        </RelativeLayout>
+        <LinearLayout
+            android:layout_marginTop="42dp"
+            android:layout_width="match_parent"
+            android:layout_height="20dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:id="@+id/artist"
+                android:gravity="top|center_horizontal"
+                android:text="作者"
+                android:textSize="15dp"
+                android:textColor="#E5E5E5"/>
+        </LinearLayout>
+
+
+
+
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="10"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:id="@+id/bottom">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="left|center_vertical"
+            android:orientation="vertical">
+
+
+            <SeekBar
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="2"
+                android:id="@+id/seekBar"
+                android:maxHeight="1dp"
+                android:maxWidth="1dp"
+                android:progressDrawable="@drawable/seekbarbg"
+                android:thumb="@drawable/currentprogress3"
+                android:indeterminate="false"
+                android:layout_gravity="center_horizontal|bottom" />
+
+
+        </LinearLayout>
+
+    </FrameLayout>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="10">
+
+        <Button
+            android:id="@+id/btn_next"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_gravity="right|center_vertical"
+            android:layout_marginRight="40dp"
+            android:background="@drawable/nextsongbg" />
+
+        <Button
+            android:id="@+id/btn_play_pause"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center"
+            android:layout_marginLeft="5dp"
+            android:background="@drawable/buttonbg" />
+
+        <Button
+            android:id="@+id/btn_pre"
+            android:layout_width="44dp"
+            android:layout_height="50dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_gravity="left|center_vertical"
+            android:layout_marginLeft="40dp"
+            android:background="@drawable/lastsongbg" />
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_weight="10"
+        android:layout_height="match_parent"></FrameLayout>
+
+</LinearLayout>

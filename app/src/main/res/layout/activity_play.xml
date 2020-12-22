@@ -20,10 +20,11 @@
             android:layout_marginTop="5dp"
             android:layout_width="match_parent"
             android:layout_height="40dp">
+
             <Button
-                android:layout_width="30dp"
-                android:layout_height="30dp"
                 android:id="@+id/back"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
                 android:layout_gravity="left|center_vertical"
                 android:background="@drawable/back"
 
@@ -31,12 +32,16 @@
 
             <TextView
                 android:id="@+id/title"
-                android:layout_width="322dp"
-                android:layout_height="40dp"
+                android:layout_width="320dp"
+                android:layout_height="50dp"
+                android:layout_centerInParent="true"
                 android:gravity="center_vertical|center_horizontal"
                 android:lines="1"
-                android:layout_marginLeft="35dp"
-                android:text="歌名"
+                android:autoSizeTextType="uniform"
+                android:autoSizeMinTextSize="12sp"
+                android:autoSizeMaxTextSize="112sp"
+                android:autoSizeStepGranularity="1sp"
+                android:layout_marginLeft="40dp"
                 android:textColor="#E5E5E5"
                 android:textSize="25dp" />
         </RelativeLayout>
@@ -46,19 +51,13 @@
             android:layout_height="20dp">
 
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="20dp"
                 android:id="@+id/artist"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:gravity="top|center_horizontal"
-                android:text="作者"
-                android:textSize="15dp"
-                android:textColor="#E5E5E5"/>
+                android:textColor="#E5E5E5"
+                android:textSize="15dp" />
         </LinearLayout>
-
-
-
-
-
     </FrameLayout>
 
     <FrameLayout

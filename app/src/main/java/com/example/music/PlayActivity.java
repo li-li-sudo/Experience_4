@@ -18,16 +18,18 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
-public class DetailActivity extends AppCompatActivity implements View.OnClickListener {
+public class PlayActivity extends AppCompatActivity implements View.OnClickListener {
     private static final String TAG = "JalLog::DetailActivity";
     private Button BtnPre, BtnPlayPause, BtnNext,back;
-    private static SeekBar seekBar;
+    private static SeekBar seekBar;     //进度条
     private MyConnection mConnection;
-    private TextView title,artist;
-    private List<Music> mMusicList;
-    private MusicService.MyBinder mBinder;
-
+    private static TextView title,artist;
+    private static List<Music> mMusicList;
+    private static MusicService.MyBinder mBinder;
+    /*建立连接*/
     class MyConnection implements ServiceConnection {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
@@ -40,17 +42,17 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
             Log.i(TAG, "onServiceDisconnected");
         }
     }
-
+    /*配置界面*/
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         Log.i(TAG, "DetailActivity :: onCreate()");
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_detail);
+        setContentView(R.layout.activity_play);
         bindView();
         bindMusicService();
     }
 
-
+    /*建立服务*/
     private void bindMusicService() {
         Intent intent = new Intent();
         intent.setClass(this, MusicService.class);
@@ -60,6 +62,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         bindService(intent, mConnection, BIND_AUTO_CREATE);
         Log.i(TAG, "mBinder:"+ mBinder);
     }
+    /*界面显示及进度条点击处理*/
     private void bindView() {
         mMusicList=MusicList.getMusicList(this);
         BtnPre=findViewById(R.id.btn_pre);
@@ -68,6 +71,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         back=findViewById(R.id.back);
         title=findViewById(R.id.title);
         artist=findViewById(R.id.artist);
+
         seekBar=findViewById(R.id.seekBar);
         Bundle bundle = getIntent().getExtras();
         String curtitle = mMusicList.get(bundle.getInt("position")).getTitle();
@@ -82,12 +86,6 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
             //进度条改变时，会调用此方法
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (progress==seekBar.getMax()) {//当滑动条到末端
-                    BtnPlayPause.setBackgroundResource(R.drawable.pause);
-                }
-                else if(mBinder.isPlaying()){
-                    BtnPlayPause.setBackgroundResource(R.drawable.play);
-                }
             }
             //滑动条开始滑动时调用
             @Override
@@ -98,7 +96,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
             public void onStopTrackingTouch(SeekBar seekBar) {
                 //根据拖动的进度改变音乐播放进度
                 int progress=seekBar.getProgress();//获取seekBar的进度
-                mBinder.seekTo(progress);//改变播放进度
+                    mBinder.seekTo(progress);//改变播放进度
             }
         });
 
@@ -109,47 +107,31 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
         @Override
         public void handleMessage(Message msg){
             Bundle bundle=msg.getData();//获取从子线程发送过来的音乐播放进度
-            int duration=bundle.getInt("duration");
-            int currentPosition=bundle.getInt("currentPosition");
-            seekBar.setMax(duration);
-            seekBar.setProgress(currentPosition);
-            //歌曲总时长
-            int minute=duration/1000/60;
-            int second=duration/1000%60;
-            String strMinute=null;
-            String strSecond=null;
-            if(minute<10){//如果歌曲的时间中的分钟小于10
-                strMinute="0"+minute;//在分钟的前面加一个0
-            }else{
-                strMinute=minute+"";
+            int duration=bundle.getInt("duration"); //获取歌曲总时长
+            int currentPosition=bundle.getInt("currentPosition");//获取播放进度
+
+            if(currentPosition < duration){
+                seekBar.setMax(duration);
+                seekBar.setProgress(currentPosition);
             }
-            if (second<10){//如果歌曲中的秒钟小于10
-                strSecond="0"+second;//在秒钟前面加一个0
-            }else{
-                strSecond=second+"";
+            else{
+                nextsong();
             }
-            //tv_total.setText(strMinute+":"+strSecond);
-            //歌曲当前播放时长
-            minute=currentPosition/1000/60;
-            second=currentPosition/1000%60;
-            if(minute<10){//如果歌曲的时间中的分钟小于10
-                strMinute="0"+minute;//在分钟的前面加一个0
-            }else{
-                strMinute=minute+" ";
-            }
-            if (second<10){//如果歌曲中的秒钟小于10
-                strSecond="0"+second;//在秒钟前面加一个0
-            }else{
-                strSecond=second+" ";
-            }
-        //    tv_progress.setText(strMinute+":"+strSecond);
         }
     };
-
-
+    public static void nextsong(){
+        mBinder.next();
+        int position1=mBinder.getPosition();
+        String nexttitle=mMusicList.get(position1).getTitle();
+        String nextartist=mMusicList.get(position1).getSinger();
+        title.setText(nexttitle);
+        artist.setText(nextartist);
+    }
+    /*按钮点击处理*/
     @Override
     public void onClick(View v) {
         switch (v.getId()){
+            /*上一曲*/
             case R.id.btn_pre:
                 mBinder.pre();
                 int position=mBinder.getPosition();
@@ -158,6 +140,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                 title.setText(pretitle);
                 artist.setText(preartist);
                 break;
+                /*暂停/开始*/
             case R.id.btn_play_pause:
                 mBinder.play_pause();
                 if(mBinder.isPlaying()){
@@ -166,16 +149,13 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
                 else
                     BtnPlayPause.setBackgroundResource(R.drawable.pause);
                 break;
+                /*下一曲*/
             case R.id.btn_next:
-                mBinder.next();
-                int position1=mBinder.getPosition();
-                String nexttitle=mMusicList.get(position1).getTitle();
-                String nextartist=mMusicList.get(position1).getSinger();
-                title.setText(nexttitle);
-                artist.setText(nextartist);
+                nextsong();
                 break;
+                /*返回*/
             case R.id.back:
-                Intent intent1=new Intent(DetailActivity.this,MainActivity.class);
+                Intent intent1=new Intent(PlayActivity.this,MainActivity.class);
                 startActivity(intent1);
                 break;
                 default:

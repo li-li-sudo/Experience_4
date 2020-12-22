@@ -24,12 +24,13 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "JalLog::MainActivity";
-    private MyConnection mConnection;
-    private MusicService.MyBinder mBinder;
-    private List<Music> mMusicList;
-    private ListView mListView;
+    private MyConnection mConnection;   //服务器连接
+    private MusicService.MyBinder mBinder;  //跨进程通信服务
+    private List<Music> mMusicList;     //音乐列表
+    private ListView mListView;     //显示音乐
     private Context mContext;
     private int mPpositionOfPlaying;//正在播放的位置
+    /*连接服务*/
     class MyConnection implements ServiceConnection {
         private static final String TAG = "LogMyConnection";
         @Override
@@ -42,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
         public void onServiceDisconnected(ComponentName name) {
         }
     }
+    /*配置页面*/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,18 +68,19 @@ public class MainActivity extends AppCompatActivity {
             initView();
         }
     }
-
+    /*获取音乐，并展示*/
     private void initView() {
         mListView = findViewById(R.id.listView);
         mMusicList = MusicList.getMusicList(this);
-        if (mBinder == null){//mBinder is null that is what bindService is not finish
+        if (mBinder == null){//mBinder为null，则bindService尚未完成内容
             bindMusicService();
         }else{
             showListView();
         }
     }
-
+    /*展示音乐列表*/
     private void showListView() {
+        /*判断当前是否有音乐正在播放，有则获取正在播放的音乐在列表中的位置*/
         if ( mBinder==null || mBinder.isNullOfPlayer()){
             mPpositionOfPlaying = -1;
         } else {
@@ -92,12 +95,12 @@ public class MainActivity extends AppCompatActivity {
                 Bundle bundle = new Bundle();
                 bundle.putInt("position", position);
                 intent.putExtras(bundle);
-                intent.setClass(MainActivity.this, DetailActivity.class);
+                intent.setClass(MainActivity.this, PlayActivity.class);
                 startActivity(intent);
             }
         });
     }
-
+    /*建立服务器连接*/
     private void bindMusicService() {
         Intent intent = new Intent();
         intent.setClass(this, MusicService.class);
@@ -105,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
         bindService(intent, mConnection, BIND_AUTO_CREATE);
     }
 
-
+    /*获取读文件权限*/
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -128,13 +131,12 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
     }
-
+    /*销毁活动*/
     @Override
     protected void onDestroy() {
         Log.i(TAG, "MainActivity :: onDestroy()");
         super.onDestroy();
     }
-
     @Override
     protected void onStart() {
         Log.i(TAG, "MainActivity :: onStart()");

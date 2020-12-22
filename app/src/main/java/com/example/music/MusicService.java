@@ -20,11 +20,11 @@ import java.util.TimerTask;
 
 public class MusicService extends Service {
     private static final String TAG = "JalLog::MusicService";
-    private MediaPlayer mPlayer;
-    private Timer timer;
-    private Music mMusic;
-    private List<Music> mMusicList;
-    private int mPosition;
+    private MediaPlayer mPlayer;        //音乐播放器对象
+    private Timer timer;    //定时设置进度条
+    private Music mMusic;   //当前播放音乐
+    private List<Music> mMusicList;     //所有音乐列表
+    private int mPosition;      //当前播放音乐在列表中的位置
     public MusicService() {
     }
 
@@ -40,67 +40,71 @@ public class MusicService extends Service {
         playIndex(mPosition);
         return super.onStartCommand(intent, flags, startId);
     }
-   //Binder跨进餐通信
+   /*Binder：跨进程通信*/
     public class MyBinder extends Binder {
-        //判断歌曲是否正在播放
+        /*判断歌曲是否正在播放*/
         public boolean isPlaying(){
             return mPlayer.isPlaying();
         }
-        //判断现在是否没有歌曲播放
+        /*判断现在是否没有歌曲播放*/
         public boolean isNullOfPlayer(){
             return mPlayer == null;
         }
-        //播放与暂停
+        /*实现播放与暂停*/
         public void play_pause() {
-            //如果歌曲在播放，点击则暂停
-            if (mPlayer.isPlaying()) {
+
+            if (mPlayer.isPlaying()) {//如果歌曲在播放，点击则暂停
                 mPlayer.pause();
                 Log.i(TAG, "Play stop");
-            //歌曲没有播放，点击开始播放
-            } else {
+
+            } else {    //歌曲没有播放，点击则开始播放
                 mPlayer.start();
                 Log.i(TAG, "Play start");
             }
         }
-        //上一曲
+        public MediaPlayer getMediaPlayer(){
+            return mPlayer;
+        }
+
+        /*上一曲*/
         public void pre(){
             mPosition = (mPosition - 1 + mMusicList.size()) % mMusicList.size();
             playIndex(mPosition);
         }
-        //下一曲
+       /*下一曲*/
         public void next(){
             mPosition = (mPosition + 1) % mMusicList.size();
             playIndex(mPosition);
         }
-        //播放
+       /*播放*/
        public void start(){
             mPlayer.start();
        }
-        //暂停
+       /*暂停*/
         public void stop(){
             mPlayer.pause();
         }
-        //当前歌曲位置
+       /*获取当前歌曲位置*/
         public int getPosition(){
             return mPosition;
         }
-        //Returns the length of the mMusic in milliseconds
 
-        //Return the name of the mMusic
-        //歌名
+       /*获取歌名*/
         public String getName(){
             return mMusic.getName();
         }
 
-        //Set the progress of mMusic playback in milliseconds
-       //歌曲播放位置
+       /*获取歌曲播放位置*/
         public void seekTo(int mesc){
             mPlayer.seekTo(mesc);
         }
+        /*获取载入音频的时长*/
+       public int getallTime(){
+           return mPlayer.getDuration();
+       }
     }
-
+    /*点击列表中的音乐名，开始播放音乐*/
     private void playIndex(int position) {
-
         if (mPlayer==null){
             mPlayer = new MediaPlayer();
         }
@@ -120,7 +124,7 @@ public class MusicService extends Service {
         }
         mPlayer.start();//播放音乐
     }
-    //添加计时器用于设置音乐播放器中的播放进度条
+    /*添加计时器用于设置音乐播放器中的播放进度条*/
     private void addTimer() {
         if(timer==null){
             timer=new Timer();
@@ -130,17 +134,17 @@ public class MusicService extends Service {
                     if(mPlayer==null)return;
                     int duration=mPlayer.getDuration();//获取歌曲总时长
                     int currentPosition=mPlayer.getCurrentPosition();//获取播放进度
-                    Message msg=DetailActivity.handler.obtainMessage();//创建消息对象
-                    //将音乐的总时长和播放进度封装至消息对象中
+                    Message msg= PlayActivity.handler.obtainMessage();//创建消息对象
+                    /*将音乐的总时长和播放进度封装至消息对象中*/
                     Bundle bundle=new Bundle();
                     bundle.putInt("duration",duration);
                     bundle.putInt("currentPosition",currentPosition);
                     msg.setData(bundle);
-                    //将消息发送到主线程的消息队列
-                    DetailActivity.handler.sendMessage(msg);
+                    /*将消息发送到主线程的消息队列*/
+                    PlayActivity.handler.sendMessage(msg);
                 }
             };
-            //开始计时任务后的5毫秒，第一次执行task任务，以后每500毫秒执行一次
+            /*开始计时任务后的5毫秒，第一次执行task任务，以后每500毫秒执行一次*/
             timer.schedule(task,5,500);
         }
     }
@@ -150,7 +154,7 @@ public class MusicService extends Service {
         Log.i(TAG, "MusicService :: onBind()");
         return new MyBinder();
     }
-
+    /*service被销毁时，回调该函数*/
     @Override
     public void onDestroy() {
         Log.i(TAG, "MusicService :: onDestroy()");

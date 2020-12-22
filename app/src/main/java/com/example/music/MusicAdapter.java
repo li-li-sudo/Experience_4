@@ -8,7 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import java.util.List;
-
+/*显示音乐列表*/
 public class MusicAdapter extends BaseAdapter {
     private Context context;
     private List<Music> musicList;
@@ -35,7 +35,7 @@ public class MusicAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        //默认
+        /*默认*/
         convertView = LayoutInflater.from(context).inflate(R.layout.music_item,null);
         //正在播放的样式
         if (position == positionOfPlaying){
